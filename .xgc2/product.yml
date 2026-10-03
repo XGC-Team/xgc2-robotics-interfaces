@@ -12,7 +12,8 @@ apt:
   - libxgc2-robotics-interfaces-dev
   package_architectures:
     libxgc2-robotics-interfaces-dev:
-    - all
+    - amd64
+    - arm64
   depends: []
 usage:
   install: sudo apt install libxgc2-robotics-interfaces-dev
