@@ -1,0 +1,33 @@
+schema: xgc2.product.v1
+id: libxgc2-robotics-interfaces-dev
+name: XGC2 Robotics Interfaces
+version: 0.1.0-1
+kind: toolchain-apt
+summary: Header-only C/C++ generic robotics measurement and control payload records.
+apt:
+  distribution: focal
+  install:
+  - libxgc2-robotics-interfaces-dev
+  packages:
+  - libxgc2-robotics-interfaces-dev
+  package_architectures:
+    libxgc2-robotics-interfaces-dev:
+    - all
+  depends: []
+usage:
+  install: sudo apt install libxgc2-robotics-interfaces-dev
+  smoke_test: cmake --find-package -DNAME=XgcRoboticsInterfaces -DCOMPILER_ID=GNU -DLANGUAGE=CXX -DMODE=EXIST
+  notes: Consumers use find_package(XgcRoboticsInterfaces 0.1.0 CONFIG REQUIRED) and XgcRoboticsInterfaces::Interfaces. The package owns no runtime binary, ROS contract, Runtime SDK or simulation lifecycle record.
+ownership:
+  paths:
+  - /usr/include/xgc-robotics-interfaces
+  - /usr/share/cmake/XgcRoboticsInterfaces
+release:
+  repository: XGC-Team/xgc2-robotics-interfaces
+  ref: main
+  workflow: release.yml
+  ci_workflow: ci.yml
+  requires: []
+  dependency_policy: {}
+  apt_versions:
+    focal: 0.1.0-1~focal

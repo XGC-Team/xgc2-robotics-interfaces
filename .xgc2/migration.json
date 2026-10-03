@@ -1,0 +1,24 @@
+{
+  "source": "ROSadapter native/interfaces/robotics-wire sealed five-file component",
+  "sourceFileSha256": {
+    "CMakeLists.txt": "74951ff30d2266df8d2978ffcc129e51a6a72975361b7ce48ddff28a0bd73b8a",
+    "cmake/XgcRoboticsWireConfig.cmake.in": "df601cd0b7b766ae17b14e1a8b35201cde7cc2e464680d6da067231100934b62",
+    "include/xgc-robotics-wire/xgc_paired_state_v1.h": "d98a0ce73a4b9f605ee63441267b7b22f122ced720f1db20650ed92e2bc670b5",
+    "include/xgc-robotics-wire/xgc_control_records_v1.h": "39811ddc24640bbd995d8bb620c3701c43bd2258d0eab95b6adc2382af1c5152",
+    "include/xgc-robotics-wire/xgc_robotics_wire_v1.h": "0a28a42a1418a92560b86808572c73b0e48d75376cd9592e28a64b03355d5e63"
+  },
+  "genericRecordCount": 14,
+  "excludedSimulationRecords": [
+    "xgc_fcu_request_v2",
+    "xgc_fcu_result_v1",
+    "xgc_fcu_extended_state_v1",
+    "xgc_sim_provider_request_v1",
+    "xgc_sim_provider_result_v1"
+  ],
+  "renamedPublicFiles": {
+    "xgc_robotics_wire_v1.h": "robotics_interfaces_v1.h",
+    "xgc_control_records_v1.h": "control_records_v1.h",
+    "xgc_paired_state_v1.h": "paired_state_v1.h"
+  },
+  "publicOwner": "XGC-Team/xgc2-robotics-interfaces"
+}
