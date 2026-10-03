@@ -92,6 +92,9 @@ def main():
     relocated = work / 'relocated'
     shutil.copytree(extracted / 'usr', relocated)
     consume('relocated', relocated)
+    # Remove /usr/include fallback before testing missing relocated payload.
+    run('dpkg', '--remove', package)
+    consume('relocated-without-installed-fallback', relocated)
     run('cmake', '-S', consumer, '-B', work / 'wrong-version',
         '-DINTERFACES_PREFIX=' + str(relocated), '-DINTERFACES_VERSION=99.0.0', success=False)
     for name in sorted(canonical):
@@ -106,7 +109,6 @@ def main():
     config.unlink()
     run('cmake', '-S', consumer, '-B', work / 'missing-config',
         '-DINTERFACES_PREFIX=' + str(relocated), '-DINTERFACES_VERSION=0.1.0', success=False)
-    run('dpkg', '--remove', package)
     run('cmake', '-S', consumer, '-B', work / 'package-removed',
         '-DINTERFACES_PREFIX=/usr', '-DINTERFACES_VERSION=0.1.0', success=False)
     checks.extend(['installed package removal refused by required CMake import', 'canonical header-only Deb payload and installed dpkg ownership',
