@@ -1,3 +1,10 @@
 @PACKAGE_INIT@
+if("ChassisHold" IN_LIST XgcRoboticsInterfaces_FIND_COMPONENTS)
+  include(CMakeFindDependencyMacro)
+  find_dependency(XgcXrpc CONFIG)
+  find_dependency(PkgConfig)
+  pkg_check_modules(XGC_HOLD_JSONCPP REQUIRED IMPORTED_TARGET jsoncpp>=1.9.4)
+  set(XgcRoboticsInterfaces_ChassisHold_FOUND TRUE)
+endif()
 include("${CMAKE_CURRENT_LIST_DIR}/XgcRoboticsInterfacesTargets.cmake")
 check_required_components(XgcRoboticsInterfaces)

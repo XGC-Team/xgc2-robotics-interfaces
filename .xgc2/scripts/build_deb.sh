@@ -30,9 +30,11 @@ Section: libdevel
 Priority: optional
 Architecture: all
 Maintainer: XGC Team <867768510@qq.com>
-Description: XGC2 generic robotics measurement and control wire headers
+Description: XGC2 robotics interfaces and simulation control contracts
  Fourteen unchanged C payload layouts, usable from C11 and C++14.
- Exports XgcRoboticsInterfaces::Interfaces; no ROS, Runtime SDK or simulation lifecycle.
+ Exports Interfaces and the optional C++20 ChassisHold component.
+ ChassisHold consumers require XgcXrpc and JsonCpp >= 1.9.4 at build time.
+ Installs simulation-v1 contracts; no runtime executable or ROS adapter.
 CONTROL
 # Build exactly one all-architecture artifact. A release orchestrator may later
 # publish these verified bytes; this local builder does not claim publication.

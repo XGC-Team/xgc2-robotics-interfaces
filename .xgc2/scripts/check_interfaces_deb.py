@@ -36,6 +36,7 @@ def main():
 
     metadata = (source / '.xgc2/product.yml').read_text()
     version = re.search(r'^    focal: (\S+)$', metadata, re.M).group(1)
+    source_version = version.split('-', 1)[0]
     package = 'libxgc2-robotics-interfaces-dev'
     fields = {field: run('dpkg-deb', '-f', args.deb, field)
               for field in ['Package', 'Version', 'Architecture', 'Depends']}
@@ -56,12 +57,20 @@ def main():
     require(not any(name in text for name in forbidden for text in texts),
             'simulation domain leaked into generic interfaces')
     config_names = {'XgcRoboticsInterfacesConfig.cmake', 'XgcRoboticsInterfacesConfigVersion.cmake', 'XgcRoboticsInterfacesTargets.cmake'}
+    hold_headers = {path.name: path for path in (source / 'include/xgc2/chassis_hold').glob('*.hpp')}
+    require(set(hold_headers) == {'state.hpp', 'provider.hpp'}, 'unexpected native hold public headers')
+    contracts = {path.name: path for path in (source / 'contracts').glob('*.md')}
+    require(set(contracts) == {'simulation-v1.md', 'chassis-hold-v1.md'}, 'unexpected public contracts')
 
     def payload(prefix):
         headers = prefix / 'include/xgc-robotics-interfaces'
         require({path.name for path in headers.iterdir()} == set(canonical), 'interfaces header set mismatch')
         for name, original in canonical.items():
             require((headers / name).read_bytes() == original.read_bytes(), 'noncanonical interfaces header: ' + name)
+        for name, original in hold_headers.items():
+            require((prefix / 'include/xgc2/chassis_hold' / name).read_bytes() == original.read_bytes(), 'noncanonical hold header: ' + name)
+        for name, original in contracts.items():
+            require((prefix / 'share/xgc2-robotics-interfaces/contracts' / name).read_bytes() == original.read_bytes(), 'noncanonical contract: ' + name)
         configs = prefix / 'share/cmake/XgcRoboticsInterfaces'
         require({path.name for path in configs.iterdir()} == config_names, 'interfaces CMake package set mismatch')
         for path in configs.iterdir():
@@ -70,7 +79,7 @@ def main():
     def consume(name, prefix, build_success=True):
         build = work / name
         run('cmake', '-S', consumer, '-B', build,
-            '-DINTERFACES_PREFIX=' + str(prefix), '-DINTERFACES_VERSION=0.1.0')
+            '-DINTERFACES_PREFIX=' + str(prefix), '-DINTERFACES_VERSION=' + source_version)
         run('cmake', '--build', build, '--parallel', '1', success=build_success)
         if build_success:
             run(build / 'c_smoke')
@@ -80,6 +89,8 @@ def main():
     run('dpkg-deb', '-x', args.deb, extracted)
     expected = {'usr/include/xgc-robotics-interfaces/' + name for name in canonical}
     expected.update('usr/share/cmake/XgcRoboticsInterfaces/' + name for name in config_names)
+    expected.update('usr/include/xgc2/chassis_hold/' + name for name in hold_headers)
+    expected.update('usr/share/xgc2-robotics-interfaces/contracts/' + name for name in contracts)
     actual = {path.relative_to(extracted).as_posix() for path in extracted.rglob('*') if not path.is_dir()}
     expected.add('usr/share/doc/' + package + '/copyright')
     require(actual == expected, 'interfaces Deb contains missing or extra payload: ' + str(actual ^ expected))
@@ -108,9 +119,9 @@ def main():
     config = relocated / 'share/cmake/XgcRoboticsInterfaces/XgcRoboticsInterfacesConfig.cmake'
     config.unlink()
     run('cmake', '-S', consumer, '-B', work / 'missing-config',
-        '-DINTERFACES_PREFIX=' + str(relocated), '-DINTERFACES_VERSION=0.1.0', success=False)
+        '-DINTERFACES_PREFIX=' + str(relocated), '-DINTERFACES_VERSION=' + source_version, success=False)
     run('cmake', '-S', consumer, '-B', work / 'package-removed',
-        '-DINTERFACES_PREFIX=/usr', '-DINTERFACES_VERSION=0.1.0', success=False)
+        '-DINTERFACES_PREFIX=/usr', '-DINTERFACES_VERSION=' + source_version, success=False)
     checks.extend(['installed package removal refused by required CMake import', 'canonical header-only Deb payload and installed dpkg ownership',
                    'installed/relocated XgcRoboticsInterfaces::Interfaces C11/C++14 ABI and config smoke',
                    'wrong interfaces version, each missing header and missing package config refused'])

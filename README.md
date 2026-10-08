@@ -1,6 +1,7 @@
 # XGC2 Robotics Interfaces
 
-Header-only C payload interfaces for generic robotics measurements and controls.
+Header-only robotics payloads, the simulation-v1 contract, and an optional
+native chassis HOLD provider.
 Source owner: [XGC-Team/xgc2-robotics-interfaces](https://github.com/XGC-Team/xgc2-robotics-interfaces).
 The product exports 14 existing records: one paired pose/velocity measurement,
 three control records, and ten measurement/control records. C type names, schema
@@ -9,13 +10,15 @@ adds no conversion, freshness, frame, estimator or control policy.
 
 The five simulation FCU/provider request, result and batch-state records belong
 to the lightweight simulator product and are excluded from this package.
-There is no Runtime SDK or ROS dependency, runtime binary or algorithm plugin.
+The base Interfaces target has no SDK or ROS dependency. ChassisHold explicitly
+requires the XgcXrpc SDK and JsonCpp >=1.9.4. There is no runtime executable or
+algorithm plugin in this package.
 The migration audit in `.xgc2/migration.json` records the original component
 hashes; public include guards, filenames and CMake names were renamed once
 before the first release. No old-name compatibility aliases exist.
 
 ```cmake
-find_package(XgcRoboticsInterfaces 0.1.0 CONFIG REQUIRED)
+find_package(XgcRoboticsInterfaces 0.2.0 CONFIG REQUIRED)
 target_link_libraries(my_consumer PRIVATE XgcRoboticsInterfaces::Interfaces)
 ```
 
@@ -25,11 +28,21 @@ Public headers are `xgc-robotics-interfaces/robotics_interfaces_v1.h`,
 The paired record is 96 bytes with independent pose/twist measurement stamps;
 its position, quaternion and linear-velocity offsets are 16, 40 and 72 bytes.
 
-First package: `libxgc2-robotics-interfaces-dev 0.1.0-1~focal`, Architecture all,
-with no hard Depends. It installs only headers, the relocatable CMake INTERFACE
-export and license; it has no ROS or SDK dependency and owns no simulation
-lifecycle schema. Both consumers declare the header owner as a build dependency,
-so their runtime package relationships do not introduce a release cycle.
+Package version `0.2.0-1~focal` installs headers, relocatable CMake exports,
+contracts and the license. The base payload layouts remain unchanged. The
+optional component is selected explicitly:
+
+```cmake
+find_package(XgcRoboticsInterfaces 0.2.0 CONFIG REQUIRED COMPONENTS ChassisHold)
+target_link_libraries(my_native_host PRIVATE XgcRoboticsInterfaces::ChassisHold)
+```
+
+ChassisHold requires C++20 and an SDK-supported compiler/runtime; the existing
+Focal C11/C++14 payload CI does not prove this new component's deployment ABI.
+Installed ChassisHold has been exercised by actual native Gazebo multi-robot
+HOLD/zero/release tests using the installed SDK. Its standalone host or embedded
+adapter has a fixed queue and roster; the embedding app owns the executor and
+producer gate. See `contracts/chassis-hold-v1.md` and `simulation-v1.md`.
 
 Push and PR CI on main reuse the Runtime SDK pattern: build one all Deb, refuse
 artifact overwrite, then download those identical bytes on native amd64 and
