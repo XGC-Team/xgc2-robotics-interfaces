@@ -1,7 +1,7 @@
 schema: xgc2.product.v1
 id: libxgc2-robotics-interfaces-dev
 name: XGC2 Robotics Interfaces
-version: 0.2.0-1
+version: 0.2.0-2
 kind: toolchain-apt
 summary: Robotics C payload records, simulation-v1 contract and optional native chassis HOLD provider.
 apt:
@@ -18,7 +18,7 @@ apt:
 usage:
   install: sudo apt install libxgc2-robotics-interfaces-dev
   smoke_test: cmake --find-package -DNAME=XgcRoboticsInterfaces -DCOMPILER_ID=GNU -DLANGUAGE=CXX -DMODE=EXIST
-  notes: Interfaces preserves C11/C++14 payload layouts without runtime dependencies. ChassisHold is an explicit optional C++20 component requiring the installed XgcXrpc SDK and JsonCpp >=1.9.4. Contracts include simulation-v1; the package installs no runtime executable or ROS adapter.
+  notes: Interfaces preserves C11/C++14 payload layouts without runtime dependencies. ChassisHold is an explicit optional C++20 component requiring the installed XgcXrpc SDK and JsonCpp >=1.7.4. Contracts include simulation-v1; the package installs no runtime executable or ROS adapter.
 ownership:
   paths:
   - /usr/include/xgc-robotics-interfaces
@@ -33,4 +33,4 @@ release:
   requires: []
   dependency_policy: {}
   apt_versions:
-    focal: 0.2.0-1~focal
+    focal: 0.2.0-2~focal

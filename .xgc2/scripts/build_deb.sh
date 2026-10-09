@@ -33,7 +33,7 @@ Maintainer: XGC Team <867768510@qq.com>
 Description: XGC2 robotics interfaces and simulation control contracts
  Fourteen unchanged C payload layouts, usable from C11 and C++14.
  Exports Interfaces and the optional C++20 ChassisHold component.
- ChassisHold consumers require XgcXrpc and JsonCpp >= 1.9.4 at build time.
+ ChassisHold consumers require XgcXrpc and JsonCpp >= 1.7.4 at build time.
  Installs simulation-v1 contracts; no runtime executable or ROS adapter.
 CONTROL
 # Build exactly one all-architecture artifact. A release orchestrator may later
