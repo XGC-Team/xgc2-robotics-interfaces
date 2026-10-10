@@ -57,18 +57,14 @@ def main():
     require(not any(name in text for name in forbidden for text in texts),
             'simulation domain leaked into generic interfaces')
     config_names = {'XgcRoboticsInterfacesConfig.cmake', 'XgcRoboticsInterfacesConfigVersion.cmake', 'XgcRoboticsInterfacesTargets.cmake'}
-    hold_headers = {path.name: path for path in (source / 'include/xgc2/chassis_hold').glob('*.hpp')}
-    require(set(hold_headers) == {'state.hpp', 'provider.hpp'}, 'unexpected native hold public headers')
     contracts = {path.name: path for path in (source / 'contracts').glob('*.md')}
-    require(set(contracts) == {'simulation-v1.md', 'chassis-hold-v1.md'}, 'unexpected public contracts')
+    require(set(contracts) == {'simulation-v1.md'}, 'unexpected public contracts')
 
     def payload(prefix):
         headers = prefix / 'include/xgc-robotics-interfaces'
         require({path.name for path in headers.iterdir()} == set(canonical), 'interfaces header set mismatch')
         for name, original in canonical.items():
             require((headers / name).read_bytes() == original.read_bytes(), 'noncanonical interfaces header: ' + name)
-        for name, original in hold_headers.items():
-            require((prefix / 'include/xgc2/chassis_hold' / name).read_bytes() == original.read_bytes(), 'noncanonical hold header: ' + name)
         for name, original in contracts.items():
             require((prefix / 'share/xgc2-robotics-interfaces/contracts' / name).read_bytes() == original.read_bytes(), 'noncanonical contract: ' + name)
         configs = prefix / 'share/cmake/XgcRoboticsInterfaces'
@@ -89,7 +85,6 @@ def main():
     run('dpkg-deb', '-x', args.deb, extracted)
     expected = {'usr/include/xgc-robotics-interfaces/' + name for name in canonical}
     expected.update('usr/share/cmake/XgcRoboticsInterfaces/' + name for name in config_names)
-    expected.update('usr/include/xgc2/chassis_hold/' + name for name in hold_headers)
     expected.update('usr/share/xgc2-robotics-interfaces/contracts/' + name for name in contracts)
     actual = {path.relative_to(extracted).as_posix() for path in extracted.rglob('*') if not path.is_dir()}
     expected.add('usr/share/doc/' + package + '/copyright')
